@@ -62,7 +62,7 @@ def detail(request, id):
         spec = get_object_or_404(Spec, support_rec=support_req)
         #проверка прав доступа к заявке
         if (user.is_staff and spec.user == user) or (support_req.creator == user):
-            messages = Message.objects.filter(support_rec=support_req).order_by('-date')
+            messages = Message.objects.filter(support_rec=support_req).order_by('date')
             data = {
                 'user': user,
                 'messages': messages,

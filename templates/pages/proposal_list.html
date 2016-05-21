@@ -27,9 +27,11 @@
               </div>
               <ul class="list-group">
                   {% for support_req in support_reqs %}
-                    <li class="list-group-item">
-                        <a href="/proposal/detail/{{ support_req.id }}/">Заявка#{{ support_req.id }}</a>
-                    </li>
+                  <li class="list-group-item">
+                    <a href="/proposal/detail/{{ support_req.id }}/">Заявка#{{ support_req.id }}</a>
+                  </li>
+                  {% empty %}
+                      <h2 class = "text-center">Пока нет заявок :(</h2>
                   {% endfor %}
               </ul>
 
