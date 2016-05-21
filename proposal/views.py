@@ -33,15 +33,24 @@ def add(request):
         )
 
         spec.save()
-        return redirect('/', {'support': support.id, 'message': 'Заявка#%d зарегестрированна' % support.id})
+        return redirect('/proposal/list/')
     else:
         return Http404('не поддерживается метод GET')
 
 def list(request):
     user = cheсk_login(request)
     if user:
-        support_reqs = SupportRecuest.objects.filter(creator=user)
-        data = {'user': user, 'support_reqs': support_reqs}
+        #заявки для специалиста
+        if user.is_staff:
+            specs = Spec.objects.filter(user=user)
+            support_reqs = []
+            for spec in specs:
+                support_reqs.append(spec.support_rec)
+            data = {'user': user, 'support_reqs': support_reqs}
+        #заявки для пользователя
+        else:
+            support_reqs = SupportRecuest.objects.filter(creator=user)
+            data = {'user': user, 'support_reqs': support_reqs}
         return render_to_response('pages/proposal_list.html', data)
     else:
         return redirect('/auth/login/')

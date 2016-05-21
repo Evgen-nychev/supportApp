@@ -12,7 +12,9 @@
                </div>
                <div class="collapse navbar-collapse" id="responsive-menu">
                  <ul class="nav navbar-nav">
-                     <li><a href="/">Оформить заявку</a></li>
+                     {% if not user.is_staff %}
+                        <li><a href="/">Оформить заявку</a></li>
+                     {% endif %}
                      <li><a href="/proposal/list/">Список заяваок</a></li>
                  </ul>
                  <ul class="nav navbar-nav navbar-right">
