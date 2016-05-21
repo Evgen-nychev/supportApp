@@ -55,7 +55,7 @@ class SupportRecuest(models.Model):
     status = models.ForeignKey(Status)
     srok = models.DateField()
     tema = models.ForeignKey(Tema)
-    desc = models.TextField()
+    desc = models.TextField(blank=True, null=True)
     class Meta:
         verbose_name = 'Заявку'
         verbose_name_plural = 'Заявки'
