@@ -1,0 +1,45 @@
+{% extends 'main.html' %}
+
+{% block title %}
+    <title>Мои заявки</title>
+{% endblock %}
+
+{% block content %}
+<h2>dfeffefefefd</h2>
+  <div class="contaner-fluid">
+  <div class="row">
+      <div class="col-md-1">
+
+      </div>
+
+      <div class="col-md-10">
+
+          <div class="panel panel-primary">
+             <div class="panel-heading">Список заявок</div>
+
+              <div class="panel-body">
+                 <div class="btn-group">
+                  <button type="button" class="btn btn-default ">Все</button>
+                  <button type="button" class="btn btn-default">Активные</button>
+                  <button type="button" class="btn btn-default">Закрытые</button>
+                </div>
+
+              </div>
+              <ul class="list-group">
+                  {% for support_req in support_reqs %}
+                    <li class="list-group-item">
+                        <a href="/proposal/detail/{{ support_req.id }}/">Заявка#{{ support_req.id }}</a>
+                    </li>
+                  {% endfor %}
+              </ul>
+
+          </div>
+      </div>
+
+      <div class="col-md-1">
+      </div>
+  </div>
+
+
+  </div>
+{% endblock %}

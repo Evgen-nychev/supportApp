@@ -77,7 +77,7 @@ class Message(models.Model):
         return "Сообщение#%d" % self.id
 
 class Spec(models.Model):
-    support_rec = models.ForeignKey(SupportRecuest)
+    support_rec = models.ForeignKey(SupportRecuest, unique=True)
     user = models.ForeignKey(User)
 
     class Meta:

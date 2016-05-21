@@ -12,12 +12,14 @@
                </div>
                <div class="collapse navbar-collapse" id="responsive-menu">
                  <ul class="nav navbar-nav">
-                     <li><a href="#">Оформить заявку</a></li>
-                     <li><a href="#">Список заяваок</a></li>
+                     <li><a href="/">Оформить заявку</a></li>
+                     <li><a href="/proposal/list/">Список заяваок</a></li>
                  </ul>
                  <ul class="nav navbar-nav navbar-right">
-
-                     <li><a href="#">Выход</a></li>
+                     {% if user.is_superuser %}
+                     <li><a href="/admin/">Админка</a></li>
+                     {% endif %}
+                     <li><a href="/auth/logout/">Выход</a></li>
                  </ul>
                </div>
            </div>

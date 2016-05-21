@@ -1,0 +1,68 @@
+{% load static %}
+<!DOCTYPE html>
+<!-- saved from url=(0038)http://bootstrap-3.ru/examples/signin/ -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="http://bootstrap-3.ru/assets/ico/favicon.ico">
+
+    <title>Авторизация</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{% static 'css/signin.css' %}" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy this line! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  <script type="text/javascript">try {
+window.AG_onLoad = function(func) { if (window.addEventListener) { window.addEventListener('DOMContentLoaded', func); } };
+window.AG_removeElementById = function(id) { var element = document.getElementById(id); if (element && element.parentNode) { element.parentNode.removeChild(element); }};
+window.AG_removeElementBySelector = function(selector) { if (!document.querySelectorAll) { return; } var nodes = document.querySelectorAll(selector); if (nodes) { for (var i = 0; i < nodes.length; i++) { if (nodes[i] && nodes[i].parentNode) { nodes[i].parentNode.removeChild(nodes[i]); } } } };
+window.AG_each = function(selector, fn) { if (!document.querySelectorAll) return; var elements = document.querySelectorAll(selector); for (var i = 0; i < elements.length; i++) { fn(elements[i]); }; };
+var AG_removeParent = function(el, fn) { while (el && el.parentNode) { if (fn(el)) { el.parentNode.removeChild(el); return; } el = el.parentNode; } };
+var AdFox_getCodeScript = function() {};
+AG_onLoad(function() { window.AG_each('iframe[id^="AdFox_iframe_"]', function(el) { if (el && el.parentNode) { el.parentNode.removeChild(el); } }); });
+try { Object.defineProperty(window, 'noAdsAtAll', { get: function() { return true; } }); } catch (ex) {}
+var _gaq = []; var _gat = { _getTracker: function() { return { _initData: function(){}, _trackPageview: function(){}, _trackEvent: function(){}, _setAllowLinker: function() {}, _setCustomVar: function() {} } }, _createTracker: function() { return this._getTracker(); }, _anonymizeIp: function() {} };
+function urchinTracker() {};
+var nol_t = function() { return { record: function() { return { post: function() {} } } } };
+} catch (ex) { console.error('Error executing AG js: ' + ex); }</script></head>
+
+  <body><panel class="drweb_select-panel" style="display: none;"><div class="drweb_tool-panel"><div class="drweb_tool-icon drweb_tool-icon_show" data-co="restore-btn" title="restore"></div><div class="drweb_tool-icon drweb_tool-icon_remove" data-co="remove-btn" title="remove"></div><div class="drweb_fit-btn" data-co="fit-btn" title=""></div></div><span data-co="label">Выберите элементы, которые не хотите видеть на этой странице</span><div class="drweb_btn" data-co="save">Сохранить</div><div class="drweb_btn" data-co="cancel">Отмена</div><div class="drweb_panel-plug" data-co="plug" style="display: none"></div></panel>
+
+    <div class="container">
+
+      <form class="form-signin" role="form" method="post" action="/auth/login/">
+        {% csrf_token %}
+        <h2 class="form-signin-heading">Авторизация</h2>
+        {% if error %}
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <strong>Ошибка!</strong>{{ error }}
+            </div>
+        {% endif %}
+        <input type="text" class="form-control" placeholder="Логин" name="login">
+        <input type="password" class="form-control" placeholder="Пароль" name="password">
+        
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Войти</button>
+      </form>
+
+    </div> <!-- /container -->
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+  
+<div></div></body></html>

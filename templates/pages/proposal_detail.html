@@ -1,0 +1,45 @@
+{% extends 'main.html' %}
+
+{% block title %}
+{% endblock %}
+
+{% block content %}
+    <h2>dfeffefefefd</h2>
+    <div class="contaner-fluid">
+        <div class="row">
+            <div class="col-md-1">
+            </div>
+
+            <div class="col-md-10">
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">Заявка#{{ support_req.id }} - Сообщения</div>
+                <ul class="list-group">
+                    {% for message in messages %}
+                    <li class="list-group-item">
+                        {{ message.user }}({{ message.date }}): {{ message.text }}
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="panel-footer">
+                <form action="/proposal/message/add/" method="post">
+                    {% csrf_token %}
+                    <textarea class="form-control" rows="3" placeholder="Введите сообщение" name="message"></textarea>
+                    <input type="hidden" name = "support_req" value="{{ support_req.id }}"/>
+                    <p></p>
+                    <input type="submit" value="Отправить" class="btn btn-primary"/>
+                </form>
+
+
+                </div>
+            </div>
+            </div>
+
+            <div class="col-md-1">
+            </div>
+        </div>
+
+
+    </div>
+{% endblock %}
