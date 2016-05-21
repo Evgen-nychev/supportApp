@@ -89,3 +89,56 @@ def message_add(request):
         message.save()
 
         return redirect('/proposal/detail/%s/' % request.POST.get('support_req', ''))
+
+def detail_edit(request, id):
+    user = cheсk_login(request)
+    if user:
+        support_req = get_object_or_404(SupportRecuest, id=id)
+        if support_req.creator == user:
+            spec = get_object_or_404(Spec, support_rec=support_req)
+            types = Tip.objects.all()
+            importants = Vajnost.objects.all()
+            updates = Status.objects.all()
+            specs = User.objects.filter(is_staff=True)
+            tems = Tema.objects.all()
+
+            data = {
+                'user': user,
+                'types': types,
+                'importants': importants,
+                'updates': updates,
+                'specs': specs,
+                'spec_active': spec,
+                'tems': tems,
+                'support_req': support_req
+            }
+
+            if request.method == 'GET':
+                data.update(csrf(request))
+                return render_to_response('pages/proposal_detail_edit.html',data)
+            elif request.method == 'POST':
+                if request.POST.get('date_dead', '') == '':
+                    date_dead = support_req.date + timedelta(days = 7)
+                else:
+                    date_dead = request.POST.get('date_dead', '')
+
+                print(request.POST.get('date_dead', ''))
+
+                support_req.desc = request.POST.get('desc', '')
+                support_req.type = Tip.objects.get(id=request.POST.get('type', ''))
+                support_req.status = Status.objects.get(id=request.POST.get('status', ''))
+                support_req.tema = Tema.objects.get(id=request.POST.get('tema', ''))
+                support_req.vajnost = Vajnost.objects.get(id=request.POST.get('important', ''))
+                support_req.srok = date_dead
+                support_req.save()
+
+                spec.user = User.objects.get(id=request.POST.get('spec', ''))
+                spec.save()
+
+
+                return redirect('/proposal/detail/%d/edit/' % support_req.id)
+
+        else:
+            return redirect('/')
+    else:
+        return redirect('/auth/login/')

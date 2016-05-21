@@ -28,7 +28,23 @@
               <ul class="list-group">
                   {% for support_req in support_reqs %}
                   <li class="list-group-item">
-                    <a href="/proposal/detail/{{ support_req.id }}/">Заявка#{{ support_req.id }}</a>
+                    <div class="media">
+                        <div class="media-body">
+                        <h4 class="media-heading"><a href="/proposal/detail/{{ support_req.id }}/">Заявка#{{ support_req.id }} - от {{ support_req.creator }}</a></h4>
+                        <span class="label label-primary">{{support_req.date}} - {{support_req.srok}}</span>
+                        <span class="label label-success">{{support_req.status}}</span>
+                        <span class="label label-danger">{{support_req.vajnost}}</span>
+                        <p>{{support_req.desc}}</p>
+                        </div>
+                        {% if not user.is_staff %}
+                        <div class="media-right">
+                            <a class="btn btn-warning" href="/proposal/detail/{{ support_req.id }}/edit/">
+                                Изменить
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+
                   </li>
                   {% empty %}
                       <h2 class = "text-center">Пока нет заявок :(</h2>
