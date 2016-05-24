@@ -1,9 +1,12 @@
 from django.shortcuts import render_to_response, redirect, get_object_or_404
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from .models import SupportRecuest, Vajnost, Status, Tema, Tip, Spec, User, Message
+from .serializers import OtdelSerializer, UserSerializer, MessageSerializer
 from datetime import datetime, timedelta
 from support.helpers import cheсk_login
 from django.core.context_processors import csrf
+import json
+import time
 
 # Create your views here.
 def add(request):
@@ -62,33 +65,49 @@ def detail(request, id):
         spec = get_object_or_404(Spec, support_rec=support_req)
         #проверка прав доступа к заявке
         if (user.is_staff and spec.user == user) or (support_req.creator == user):
-            messages = Message.objects.filter(support_rec=support_req).order_by('date')
-            data = {
-                'user': user,
-                'messages': messages,
-                'support_req': support_req
-            }
+            if request.is_ajax():
+                if request.method == "GET":
+                    messages = MessageSerializer(Message.objects.filter(support_rec=support_req).order_by('date'), many=True).data
+                    return JsonResponse({'messages': messages, 'support' : support_req.id})
+                if request.method == "POST":
+                    data = json.loads(request.body.decode("utf-8"))
+                    action = data.get("action", "")
+                    if action == "addMessage":
+                        message = Message(
+                            support_rec = support_req,
+                            user = user,
+                            text = data.get('message', ''),
+                            date = datetime.now()
+                        )
 
-            data.update(csrf(request))
-
-            return render_to_response('pages/proposal_detail.html', data)
+                        message.save()
+                        return JsonResponse({'message': MessageSerializer(message).data})
+                    else:
+                        return Http404('Action Does Not Exist!')
+            else:
+                data = {
+                    'user': user,
+                    'support_req': support_req
+                }
+                data.update(csrf(request))
+                return render_to_response('pages/proposal_detail.html', data)
         else:
             return redirect('/')
     else:
         return redirect('/auth/login/')
 
-def message_add(request):
-    if request.method == "POST":
-        message = Message(
-            support_rec = SupportRecuest.objects.get(id=request.POST.get('support_req', '')),
-            user = request.user,
-            text = request.POST.get('message', ''),
-            date = datetime.now()
-        )
+def long_polling(request, id):
+    if request.method == "POST" and request.is_ajax():
+        support_req = get_object_or_404(SupportRecuest, id=id)
+        data = json.loads(request.body.decode('utf-8'))
+        while True:
+            messages = Message.objects.filter(support_rec=support_req, id__gt=data.get('lastID',0))
+            if messages.count():
+                break
 
-        message.save()
-
-        return redirect('/proposal/detail/%s/' % request.POST.get('support_req', ''))
+            time.sleep(1)
+        messages = MessageSerializer(messages, many=True).data
+        return JsonResponse({'messages': messages})
 
 def detail_edit(request, id):
     user = cheсk_login(request)

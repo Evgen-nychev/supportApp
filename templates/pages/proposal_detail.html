@@ -1,7 +1,13 @@
 {% extends 'main.html' %}
+{% load static %}
 
 {% block title %}
     <title>Заявка#{{ support_req.id }}</title>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'js/library/angular.min.js' %}"></script>
+    <script src="{% static 'js/app/messages.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -9,34 +15,40 @@
     <div class="contaner-fluid">
         <div class="row">
             <div class="col-md-1">
+                {% csrf_token %}
             </div>
+            {% verbatim %}
+            <div class="col-md-10" ng-app = "app">
+                <div class="panel panel-primary" ng-controller="MessagesCtr">
+                    <div class="panel-heading">Заявка#{{ support_req.id }} - Сообщения</div>
+                    <ul class="list-group pre-scrollable">
+                        <li class="list-group-item" ng-repeat = "message in messages">
+                            <div class="media">
+                                <a class="pull-left" href="#">
+                                    <img class="media-object" src="/static/images/user-default-2.png/" ng-if="message.user.is_staff">
+                                    <img class="media-object" src="/static/images/user-default.png/" ng-if="!message.user.is_staff">
+                                </a>
+                                <div class="media-body">
+                                <h4 class="media-heading">
+                                    <strong>{{ message.user.first_name }} {{ message.user.last_name }}</strong>
+                                    <small>{{ message.user.otdel.name }}</small>
+                                </h4>
+                                    <span class="label label-primary">{{ message.date | date : 'dd.MM.yyyy HH:mm:ss'}}</span>
+                                    <p>{{ message.text }}</p>
+                                </div>
+                            </div>
 
-            <div class="col-md-10">
+                        </li>
+                    </ul>
 
-            <div class="panel panel-primary">
-                <div class="panel-heading">Заявка#{{ support_req.id }} - Сообщения</div>
-                <ul class="list-group">
-                    {% for message in messages %}
-                    <li class="list-group-item">
-                        {{ message.user }}({{ message.date }}): {{ message.text }}
-                    </li>
-                    {% endfor %}
-                </ul>
-
-                <div class="panel-footer">
-                <form action="/proposal/message/add/" method="post">
-                    {% csrf_token %}
-                    <textarea class="form-control" rows="3" placeholder="Введите сообщение" name="message"></textarea>
-                    <input type="hidden" name = "support_req" value="{{ support_req.id }}"/>
-                    <p></p>
-                    <input type="submit" value="Отправить" class="btn btn-primary"/>
-                </form>
-
-
+                    <div class="panel-footer">
+                        <textarea class="form-control" rows="3" placeholder="Введите сообщение" ng-model="userMessage"></textarea>
+                        <p></p>
+                        <button class="btn btn-primary" ng-click="sendMessage()">Отправить</button>
+                    </div>
                 </div>
             </div>
-            </div>
-
+            {% endverbatim %}
             <div class="col-md-1">
             </div>
         </div>
