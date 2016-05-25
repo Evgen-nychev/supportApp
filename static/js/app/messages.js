@@ -14,7 +14,7 @@ App.controller('MessagesCtr', function($scope, $http, $interval){
             .then(function(response){
                 $scope.messages = response.data.messages
                 $scope.support = response.data.support;
-                polling();
+                $interval(polling, 1000)
             })
     }
 
@@ -28,7 +28,6 @@ App.controller('MessagesCtr', function($scope, $http, $interval){
                             $scope.messages.push(message);
                         })
                     }
-                    polling()
                 })
     }
     $scope.sendMessage = function(){

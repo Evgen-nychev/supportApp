@@ -100,12 +100,7 @@ def long_polling(request, id):
     if request.method == "POST" and request.is_ajax():
         support_req = get_object_or_404(SupportRecuest, id=id)
         data = json.loads(request.body.decode('utf-8'))
-        while True:
-            messages = Message.objects.filter(support_rec=support_req, id__gt=data.get('lastID',0))
-            if messages.count():
-                break
-
-            time.sleep(1)
+        messages = Message.objects.filter(support_rec=support_req, id__gt=data.get('lastID',0))
         messages = MessageSerializer(messages, many=True).data
         return JsonResponse({'messages': messages})
 
