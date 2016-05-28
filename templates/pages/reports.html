@@ -1,0 +1,71 @@
+{% extends 'main.html' %}
+{% block title %}
+    <title>Отчеты</title>
+{% endblock %}
+{% block content %}
+<h2>dfeffefefefd</h2>
+<div class="contaner-fluid">
+    <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-10">
+        <!--Панель со списком-->
+            <div class="panel panel-primary">
+                <div class="panel-heading">ОТЧЁТНОСТЬ</div>
+
+                <div class="panel-body">
+                    <!--Отделил отчётность-->
+                    <div class="well">
+                        <form action="" method="post" class="form-horizontal">
+                            {% csrf_token %}
+                            <div class="form-group">
+                            <!--Для выбора статуса-->
+                            <label  class="col-md-1 control-label">Статусы</label>
+                            <div class="col-md-2">
+                            <select class="form-control" name="status">
+                                <option value="" selected>Все</option>
+                                {% for status in status_more %}
+                                    <option value="{{ status.id }}">{{ status.name }}</option>
+                                {% endfor %}
+                            </select>
+                            </div>
+                            <!--Для для выбора отдела-->
+                            <label for="date" class="col-md-1 control-label">Отделы</label>
+                            <div class="col-md-2">
+                                <select class="form-control" name="otdel">
+                                    <option value="" selected>Все</option>
+                                    {% for otdel in otdels %}
+                                        <option value="{{ otdel.id }}">{{ otdel.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            </div>
+                            <div class="form-group">
+                            <!--Для для выбора периода-->
+
+                                <label for="date" class="col-md-1 control-label">От</label>
+                                <div class="col-md-2">
+                                    <input type="date" class="form-control" name="dateF"/>
+                                </div>
+                                <label for="date" class="col-md-1 control-label">До</label>
+                                <div class="col-md-2">
+                                    <input type="date" class="form-control" name="dateL"/>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-1">
+
+                                </div>
+                                <!--Для скачивания отчёта-->
+                                <div class="col-md-2">
+                                    <input type="submit" class="btn btn-primary" value="Сформировать отчёт"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

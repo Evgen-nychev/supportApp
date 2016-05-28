@@ -1,10 +1,13 @@
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import Http404, HttpResponse, JsonResponse
-from .models import SupportRecuest, Vajnost, Status, Tema, Tip, Spec, User, Message
+from .models import SupportRecuest, Vajnost, Status, Tema, Tip, Spec, User, Message, Otdel
 from .serializers import OtdelSerializer, UserSerializer, MessageSerializer
 from datetime import datetime, timedelta
-from support.helpers import cheсk_login
+from django.http import HttpResponse, Http404
+from support.helpers import cheсk_login, check_filtered_item
 from django.core.context_processors import csrf
+from django_excel import make_response_from_query_sets, make_response_from_records
+import pyexcel.ext.xlsx
 import json
 import time
 
@@ -40,20 +43,35 @@ def add(request):
     else:
         return Http404('не поддерживается метод GET')
 
-def list(request):
+def list(request, status="all"):
     user = cheсk_login(request)
     if user:
         #заявки для специалиста
         if user.is_staff:
-            specs = Spec.objects.filter(user=user)
+            if status == 'active':
+                specs = Spec.objects.filter(user=user, support_rec__status__in = [3, 2])
+            elif status == 'close':
+                specs = Spec.objects.filter(user=user, support_rec__status = 4)
+            else:
+                specs = Spec.objects.filter(user=user)
             support_reqs = []
             for spec in specs:
+                spec.support_rec.spec = request.user
                 support_reqs.append(spec.support_rec)
-            data = {'user': user, 'support_reqs': support_reqs}
+            data = {'user': user, 'support_reqs': support_reqs, 'status': status}
         #заявки для пользователя
         else:
-            support_reqs = SupportRecuest.objects.filter(creator=user)
-            data = {'user': user, 'support_reqs': support_reqs}
+            if status == 'active':
+                support_reqs = SupportRecuest.objects.filter(creator=user, status__in = [3, 2])
+            elif status == 'close':
+                support_reqs = SupportRecuest.objects.filter(creator=user, status = 4)
+            else:
+                support_reqs = SupportRecuest.objects.filter(creator=user)
+
+            for support_req in support_reqs:
+                support_req.spec = Spec.objects.get(support_rec=support_req).user
+
+            data = {'user': user, 'support_reqs': support_reqs, 'status': status}
         return render_to_response('pages/proposal_list.html', data)
     else:
         return redirect('/auth/login/')
@@ -156,3 +174,42 @@ def detail_edit(request, id):
             return redirect('/')
     else:
         return redirect('/auth/login/')
+
+def reports(request):
+    if request.method == "GET":
+        status_more = Status.objects.all()
+        odels = Otdel.objects.all()
+        data = {
+            'user': request.user,
+            'status_more': status_more,
+            'otdels': odels
+        }
+        data.update(csrf(request))
+
+        return render_to_response('pages/reports.html', data)
+    elif request.method == "POST":
+        data = request.POST
+        filtered_items = {}
+        check_filtered_item(filtered_items, data.get('support_rec__otdel', ''), 'otdel')
+        check_filtered_item(filtered_items, data.get('support_rec__status', ''), 'status')
+        if len(data.get('dateF', '')) and len(data.get('dateL', '')):
+            filtered_items['support_rec__date__range'] = (data.get('dateF'), data.get('dateL'))
+
+        #support_reqs = SupportRecuest.objects.filter(**filtered_items)
+        specs = Spec.objects.filter(user=request.user, **filtered_items)
+        result = []
+        for spec in specs:
+            result.append({
+                'Создатель': spec.support_rec.creator.get_full_name(),
+                "Тема": spec.support_rec.tema.name,
+                'Тип': spec.support_rec.type.name,
+                'Важность': spec.support_rec.vajnost.name,
+                'Статус': spec.support_rec.status.name,
+                'Дата Создания': spec.support_rec.date,
+                "Срок(До)": spec.support_rec.srok,
+                "Описание": spec.support_rec.desc,
+                "Специалист": spec.user.username
+            })
+        return make_response_from_records(result, 'xlsx', file_name='report')
+    else:
+        raise Http404('Запрос не поддерживается')

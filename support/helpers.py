@@ -4,3 +4,7 @@ def cheсk_login(request):
         return request.user
     else:
         return False
+
+def check_filtered_item(items ,item, name):
+    if len(item):
+        items[name] = item

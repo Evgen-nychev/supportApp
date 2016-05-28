@@ -14,8 +14,12 @@
                  <ul class="nav navbar-nav">
                      {% if not user.is_staff %}
                         <li><a href="/">Оформить заявку</a></li>
+                        <li><a href="/proposal/list/">Список заяваок</a></li>
+                        {% else %}
+                        <li><a href="/proposal/list/">Список заяваок</a></li>
+                        <li><a href="/proposal/reports/">Отчеты</a></li>
                      {% endif %}
-                     <li><a href="/proposal/list/">Список заяваок</a></li>
+
                  </ul>
                  <ul class="nav navbar-nav navbar-right">
                      {% if user.is_superuser %}
