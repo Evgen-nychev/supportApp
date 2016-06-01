@@ -190,20 +190,22 @@ def reports(request):
     elif request.method == "POST":
         data = request.POST
         filtered_items = {}
-        check_filtered_item(filtered_items, data.get('support_rec__otdel', ''), 'otdel')
-        check_filtered_item(filtered_items, data.get('support_rec__status', ''), 'status')
+        check_filtered_item(filtered_items, data.get('otdel', ''), 'creator__otdel')
+        check_filtered_item(filtered_items, data.get('status', ''), 'status')
         if len(data.get('dateF', '')) and len(data.get('dateL', '')):
-            filtered_items['support_rec__date__range'] = (data.get('dateF'), data.get('dateL'))
+            filtered_items['date__range'] = (data.get('dateF'), data.get('dateL'))
 
-        #support_reqs = SupportRecuest.objects.filter(**filtered_items)
-        specs = Spec.objects.filter(user=request.user, **filtered_items)
         result = []
+        supp_reqs = SupportRecuest.objects.filter(**filtered_items)
+        specs = Spec.objects.filter(support_rec__in=supp_reqs)
+
         for spec in specs:
             result.append({
                 'Создатель': spec.support_rec.creator.get_full_name(),
                 "Тема": spec.support_rec.tema.name,
                 'Тип': spec.support_rec.type.name,
                 'Важность': spec.support_rec.vajnost.name,
+                "Отдел": spec.support_rec.creator.otdel.name,
                 'Статус': spec.support_rec.status.name,
                 'Дата Создания': spec.support_rec.date,
                 "Срок(До)": spec.support_rec.srok,
