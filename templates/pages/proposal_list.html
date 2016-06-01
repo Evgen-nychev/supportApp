@@ -1,47 +1,69 @@
 {% extends 'main.html' %}
+{% load static %}
 
 {% block title %}
     <title>Мои заявки</title>
 {% endblock %}
 
+{% block scripts %}
+    <script src="{% static 'js/library/angular.min.js' %}"></script>
+    <script src="{% static 'js/app/support_list.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <h2>dfeffefefefd</h2>
-  <div class="contaner-fluid">
+  <div class="contaner-fluid" ng-app = "app" ng-controller="SupportListCtrl">
   <div class="row">
       <div class="col-md-1">
-
       </div>
 
-      <div class="col-md-10">
+      <div class="col-md-3">
+        {% include 'includes/list_filters.html' %}
+      </div>
 
+      <div class="col-md-7">
           <div class="panel panel-primary">
              <div class="panel-heading">Список заявок</div>
 
               <div class="panel-body">
                  <div class="btn-group">
-                  <a href="/proposal/list/all/" class="btn {% if status == 'all' %} btn-primary {% else %} btn-default {% endif %}">Все</a>
-                  <a href="/proposal/list/active/" class="btn {% if status == 'active' %} btn-primary {% else %} btn-default {% endif %}">Активные</a>
-                  <a href="/proposal/list/close/" class="btn {% if status == 'close' %} btn-primary {% else %} btn-default {% endif %}">Закрытые</a>
-                </div>
+                  <button class="btn btn-default"
+                    ng-class="{'btn-primary': filters.status == 'all'}"
+                    ng-click="setStatus('all')">
+                      Все
+                  </button>
+                  <button class="btn btn-default"
+                    ng-class="{'btn-primary': filters.status == 'active'}"
+                    ng-click="setStatus('active')">
+                      Активные
+                  </button>
+                  <button class="btn btn-default"
+                    ng-class="{'btn-primary': filters.status == 'close'}"
+                    ng-click="setStatus('close')">
+                      Закрытые
+                  </button>
+              </div>
 
               </div>
               <ul class="list-group">
-                  {% for support_req in support_reqs %}
-                  <li class="list-group-item">
+                  {% verbatim %}
+                  <li class="list-group-item" ng-repeat="support_req in data.support_reqs | filter : filteredStatus(filters.status)
+                  | filter : {creator : {otdel : {id : filters.otdel}}, configuration_1c : {id : filters.configuration} } as filteredSupport">
                     <div class="media">
                         <div class="media-body">
                         <h4 class="media-heading">
-                            <a href="/proposal/detail/{{ support_req.id }}/">Заявка#{{ support_req.id }}_{{ support_req.creator }}
+                            <a href="/proposal/detail/{{ support_req.id }}/">Заявка#{{ support_req.id }}_{{ support_req.creator.username }}
                             </a>
-                            <small>:{{ support_req.creator.otdel }}</small>
+                            <small>:{{ support_req.creator.otdel.name }}</small>
                         </h4>
                         <blockquote>
                             <ul class="list-unstyled">
-                                <li>Специалист: <span class="label label-info">{{support_req.spec}}</span></li>
-                                <li>Тема: <span class="label label-default">{{support_req.tema}}</span></li>
-                                <li>Тип: <span class="label label-warning">{{support_req.type}}</span></li>
-                                <li>Статус: <span class="label label-success">{{support_req.status}}</span></li>
-                                <li>Важность: <span class="label label-danger">{{support_req.vajnost}}</span></li>
+                                <li>Специалист: <span class="label label-info">{{support_req.spec.username}}</span></li>
+                                <li>Версия 1С: <span class="label label-primary">{{support_req.configuration_1c.name}}</span></li>
+                                <li>Тема: <span class="label label-default">{{support_req.tema.name}}</span></li>
+                                <li>Тип: <span class="label label-warning">{{support_req.type.name}}</span></li>
+                                <li>Статус: <span class="label label-success">{{support_req.status.name}}</span></li>
+                                <li>Важность: <span class="label label-danger">{{support_req.vajnost.name}}</span></li>
                                 <li>Сроки : <span class="label label-primary">{{support_req.date}} - {{support_req.srok}}</span></li>
                             </ul>
                         </blockquote>
@@ -50,19 +72,17 @@
                             <p>{{support_req.desc}}</p>
                         </div>
                         </div>
-                        {% if not user.is_staff %}
-                        <div class="media-right">
+                        <div class="media-right" ng-if="support_req.creator.id == data.user.id">
                             <a class="btn btn-warning" href="/proposal/detail/{{ support_req.id }}/edit/">
                                 Изменить
                             </a>
                         </div>
-                        {% endif %}
                     </div>
 
                   </li>
-                  {% empty %}
-                      <h2 class = "text-center">Пока нет заявок :(</h2>
-                  {% endfor %}
+                  <h2 class = "text-center" ng-if="!filteredSupport.length">Данные не найдены :(</h2>
+                  <h2 class = "text-center" ng-if="!data.support_reqs.length">Пока нет заявок :(</h2>
+                  {% endverbatim %}
               </ul>
 
           </div>

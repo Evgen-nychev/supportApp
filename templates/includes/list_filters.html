@@ -1,0 +1,33 @@
+{% verbatim %}
+<div class="panel panel-success">
+    <div class="panel-heading">Отделы</div>
+    <div class="panel-body">
+        <input class="form-control" type="text" placeholder="Поиск отдела..." ng-model="filters.search.otdel"/>
+    </div>
+    <div class="list-group">
+        <a href="" class="list-group-item"
+           ng-repeat ="otdel in data.otdels | filter : { name: filters.search.otdel}"
+           ng-class = "{'list-group-item-success': otdel.id == filters.otdel}"
+           ng-click ="setOtdel(otdel.id)">
+            {{ otdel.name }}
+        </a>
+    </div>
+</div>
+
+<div class="panel panel-danger">
+    <div class="panel-heading">Конфигурации 1С</div>
+    <div class="panel-body">
+        <input class="form-control" type="text" placeholder="Конфигурации..." ng-model="filters.search.configuration"/>
+    </div>
+    <div class="list-group">
+        <a href="" class="list-group-item"
+           ng-repeat ="configuration in data.configurations | filter : filteredConfigur(filters.otdel)
+           | filter : {name : filters.search.configuration}"
+           ng-class ="{' list-group-item-danger': configuration.id == filters.configuration}"
+           ng-click = "setConfig(configuration.id)">
+            {{ configuration.name }}
+        </a>
+    </div>
+</div>
+{% endverbatim %}
+

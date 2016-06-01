@@ -1,9 +1,9 @@
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import Http404, HttpResponse, JsonResponse
-from .models import SupportRecuest, Vajnost, Status, Tema, Tip, Spec, User, Message, Otdel
-from .serializers import OtdelSerializer, UserSerializer, MessageSerializer
+from .models import SupportRecuest, Vajnost, Status, Tema, Tip, Spec, User, Message, Otdel, ConfugurationOneC
+from .serializers import OtdelSerializer, UserSerializer, MessageSerializer, SupportRecuestSerializer, ConfugurationOneCSerializaer
 from datetime import datetime, timedelta
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from support.helpers import cheсk_login, check_filtered_item
 from django.core.context_processors import csrf
 from django_excel import make_response_from_query_sets, make_response_from_records
@@ -28,6 +28,7 @@ def add(request):
             status = Status.objects.get(id=request.POST.get('status', '')),
             tema = Tema.objects.get(id=request.POST.get('tema', '')),
             vajnost = Vajnost.objects.get(id=request.POST.get('important', '')),
+            configuration_1c = ConfugurationOneC.objects.get(id=request.POST.get('configuration', '')),
             date = date,
             srok = date_dead
         )
@@ -46,33 +47,30 @@ def add(request):
 def list(request, status="all"):
     user = cheсk_login(request)
     if user:
-        #заявки для специалиста
-        if user.is_staff:
-            if status == 'active':
-                specs = Spec.objects.filter(user=user, support_rec__status__in = [3, 2])
-            elif status == 'close':
-                specs = Spec.objects.filter(user=user, support_rec__status = 4)
-            else:
+        if request.is_ajax():
+            #заявки для специалиста
+            if user.is_staff:
                 specs = Spec.objects.filter(user=user)
-            support_reqs = []
-            for spec in specs:
-                spec.support_rec.spec = request.user
-                support_reqs.append(spec.support_rec)
-            data = {'user': user, 'support_reqs': support_reqs, 'status': status}
-        #заявки для пользователя
-        else:
-            if status == 'active':
-                support_reqs = SupportRecuest.objects.filter(creator=user, status__in = [3, 2])
-            elif status == 'close':
-                support_reqs = SupportRecuest.objects.filter(creator=user, status = 4)
+                support_reqs = []
+                for spec in specs:
+                    support_req = SupportRecuestSerializer(spec.support_rec).data
+                    support_req['spec'] = UserSerializer(request.user).data
+                    support_reqs.append(support_req)
+                data = {'support_reqs': support_reqs}
+            #заявки для пользователя
             else:
-                support_reqs = SupportRecuest.objects.filter(creator=user)
+                support_reqs = SupportRecuestSerializer(SupportRecuest.objects.filter(creator=user).order_by('-date'), many=True).data
+                for support_req in support_reqs:
+                    support_req['spec'] = UserSerializer(Spec.objects.get(support_rec__id=support_req['id']).user).data
 
-            for support_req in support_reqs:
-                support_req.spec = Spec.objects.get(support_rec=support_req).user
+                data = {'support_reqs': support_reqs}
 
-            data = {'user': user, 'support_reqs': support_reqs, 'status': status}
-        return render_to_response('pages/proposal_list.html', data)
+            data['user'] = UserSerializer(user).data
+            data['otdels'] = OtdelSerializer(Otdel.objects.all(), many=True).data
+            data['configurations'] = ConfugurationOneCSerializaer(ConfugurationOneC.objects.all(), many=True).data
+            return JsonResponse(data)
+        else:
+            return render_to_response('pages/proposal_list.html', {'user': user})
     else:
         return redirect('/auth/login/')
 

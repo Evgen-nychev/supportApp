@@ -1,28 +1,43 @@
 {% extends 'main.html' %}
+{% load static %}
 
 {% block title %}
     <title>Обработчик заявки на техническую поддержку</title>
 {% endblock %}
 
+{% block scripts %}
+    <script src="{% static 'js/library/angular.min.js' %}"></script>
+    <script src="{% static 'js/app/support_add.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <h2>Заявка</h2>
-<div class="container-fluid">
+<div class="container-fluid" ng-app="app">
     <div class="row">
         <div class="col-md-1"></div>
-        <div class="col-md-10">
+        <div class="col-md-10" ng-controller="SupportCtrl">
            <h2 class="text-center">Бланк заявки</h2>
             <div class="well">
-                {{ message }}
                 <form action="/proposal/add/" method="post" class="form-horizontal">
                     {% csrf_token %}
+                    {% verbatim %}
                     <div class="form-group">
                         <label  class="col-sm-2 control-label">Пользователь</label>
                         <div class="col-sm-2">
-                            <input type="text" class="form-control"  placeholder="{{ user }}" disabled>
+                            <input type="text" class="form-control"  placeholder="{{ data.user.username }}" disabled>
                         </div>
                         <label  class="col-sm-1 control-label">Отдел</label>
                         <div class="col-sm-2">
-                           <input type="nuber" class="form-control"  placeholder="{{ user.otdel }}" disabled>
+                           <input type="nuber" class="form-control"  placeholder="{{ data.user.otdel.name }}" disabled>
+                        </div>
+                        <label  class="col-sm-1 control-label">Конфигурация 1С</label>
+                        <div class="col-sm-2">
+                              <select class="form-control" name = 'configuration' ng-model="configurationC">
+                                    <option value="{{ config.id }}"
+                                        ng-repeat="config in data.user.otdel.configuration_1c">
+                                        {{ config.name }}
+                                    </option>
+                              </select>
                         </div>
                     </div>
 
@@ -31,25 +46,25 @@
                         <label  class="col-sm-2 control-label">Тип</label>
                         <div class="col-sm-2">
                             <select class="form-control" name = 'type'>
-                                {% for type in types %}
-                                    <option value="{{ type.id }}">{{ type }}</option>
-                                {% endfor %}
+                                <option value="{{ type.id }}" ng-repeat="type in data.types">
+                                    {{ type.name }}
+                                </option>
                             </select>
                         </div>
                         <label  class="col-sm-1 control-label">Важность</label>
                         <div class="col-sm-2">
                             <select class="form-control" name = "important">
-                                {% for important in importants %}
-                                    <option value="{{ important.id }}">{{ important }}</option>
-                                {% endfor %}
+                                <option value="{{ important.id }}" ng-repeat="important in data.importants">
+                                    {{ important.name }}
+                                </option>
                             </select>
                         </div>
                        <label  class="col-sm-1 control-label">Статус</label>
                        <div class="col-sm-2">
                             <select class="form-control" name = "status">
-                                {% for status in updates %}
-                                    <option value="{{ status.id }}">{{ status }}</option>
-                                {% endfor %}
+                                <option value="{{ status.id }}" ng-repeat="status in data.updates">
+                                    {{ status.name }}
+                                </option>
                             </select>
                        </div>
                     </div>
@@ -61,18 +76,17 @@
                         <label  class="col-sm-2 control-label">Специалист</label>
                         <div class="col-sm-2">
                             <select class="form-control" name = "spec">
-                                {% for spec in specs %}
-                                    <option value="{{ spec.id }}">{{ spec }}</option>
-                                {% endfor %}
+                                <option value="{{ spec.id }}" ng-repeat="spec in data.specs">
+                                    {{ spec.username }}
+                                </option>
                             </select>
-
                         </div>
                        <label  class="col-sm-1 control-label">Тема</label>
                        <div class="col-sm-2">
                             <select class="form-control" name = "tema">
-                                {% for tema in tems %}
-                                    <option value="{{ tema.id }}">{{ tema }}</option>
-                                {% endfor %}
+                                <option value="{{ tema.id }}" ng-repeat="tema in data.tems | filter : {configuration_1c : configurationC}">
+                                    {{ tema.name }}
+                                </option>
                             </select>
                        </div>
 
@@ -89,6 +103,7 @@
                         </div>
                     </div>
                     <input type="submit" value="Создать Заявку" class="btn btn-primary"/>
+                    {% endverbatim %}
                 </form>
 
 

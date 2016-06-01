@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Status,Tema,Vajnost,Otdel,User,Tip,SupportRecuest,Message,Spec
+from .models import Status,Tema,Vajnost,Otdel,User,Tip,SupportRecuest,Message,Spec, ConfugurationOneC
 from .forms import AdminUserAddForm, AdminUserChangeForm
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
@@ -38,6 +38,7 @@ class VajnostAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_display = ('id','name')
 class OtdelAdmin(admin.ModelAdmin):
+    filter_horizontal = ('configuration_1c', )
     search_fields = ('name',)
     list_display = ('id','name')
 
@@ -47,7 +48,8 @@ admin.site.register(User, UserAdmin)
 admin.site.register(Status,StatusAdmin)
 admin.site.register(Tema,TemaAdmin)
 admin.site.register(Vajnost,VajnostAdmin)
-admin.site.register(Otdel,VajnostAdmin)
+admin.site.register(Otdel,OtdelAdmin)
+admin.site.register(ConfugurationOneC)
 admin.site.register(Tip)
 admin.site.register(SupportRecuest)
 admin.site.register(Message)

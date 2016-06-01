@@ -10,8 +10,17 @@ class Status(models.Model):
     def __str__(self):
         return self.name
 
+class ConfugurationOneC(models.Model):
+    name = models.CharField(max_length=200, verbose_name='Название')
+    class Meta:
+        verbose_name = 'Конфигурацию 1С'
+        verbose_name_plural = 'Конфигурации 1С'
+    def __str__(self):
+        return self.name
+
 class Tema(models.Model):
     name = models.CharField(max_length=200, db_index=True, verbose_name='Название')
+    configuration_1c = models.ForeignKey(ConfugurationOneC, null=True, blank=True)
     class Meta:
         verbose_name = 'Тему'
         verbose_name_plural = 'Темы'
@@ -28,6 +37,7 @@ class Vajnost(models.Model):
 
 class Otdel(models.Model):
     name = models.CharField(max_length=200, db_index=True, verbose_name='Название')
+    configuration_1c = models.ManyToManyField(ConfugurationOneC, blank=True, verbose_name='Конфигурации 1С')
     class Meta:
         verbose_name = 'Отдел'
         verbose_name_plural = 'Отделы'
@@ -49,6 +59,7 @@ class User(AbstractUser):
 
 class SupportRecuest(models.Model):
     creator = models.ForeignKey(User)
+    configuration_1c = models.ForeignKey(ConfugurationOneC, null=True, blank=True)
     date = models.DateField()
     type = models.ForeignKey(Tip)
     vajnost = models.ForeignKey(Vajnost)

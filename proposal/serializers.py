@@ -1,7 +1,12 @@
 from rest_framework import serializers
-from .models import Message, User, Otdel, Vajnost, Status, Tema, Tip, SupportRecuest
+from .models import Message, User, Otdel, Vajnost, Status, Tema, Tip, SupportRecuest, ConfugurationOneC
+
+class ConfugurationOneCSerializaer(serializers.ModelSerializer):
+    class Meta:
+        model = ConfugurationOneC
 
 class OtdelSerializer(serializers.ModelSerializer):
+    configuration_1c = ConfugurationOneCSerializaer(many=True, read_only=True)
     class Meta:
         model = Otdel
 
@@ -9,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
     otdel = OtdelSerializer()
     class Meta:
         model = User
-        fields = ('id', 'first_name', 'last_name', 'otdel', 'is_staff')
+        fields = ('id', 'first_name', 'username', 'last_name', 'otdel', 'is_staff')
 
 class VajnostSeriz(serializers.ModelSerializer):
     class Meta:
@@ -20,7 +25,7 @@ class StatusSeriz(serializers.ModelSerializer):
         model = Status
 
 class TemaSeriz(serializers.ModelSerializer):
-    class Meata:
+    class Meta:
         model = Tema
 
 class TipSeriz(serializers.ModelSerializer):
@@ -29,6 +34,11 @@ class TipSeriz(serializers.ModelSerializer):
 
 class SupportRecuestSerializer(serializers.ModelSerializer):
     creator = UserSerializer()
+    type = TipSeriz()
+    vajnost = VajnostSeriz()
+    status = StatusSeriz()
+    tema = TemaSeriz()
+    configuration_1c = ConfugurationOneCSerializaer()
     class Meta:
         model = SupportRecuest
 
