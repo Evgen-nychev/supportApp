@@ -10,7 +10,7 @@
     <div class="row">
         <div class="col-md-1"></div>
         <div class="col-md-10">
-           <h2 class="text-center">Бланк заявки</h2>
+           <h2 class="text-center">Бланк заявки на техническую поддержку 1С</h2>
             <div class="well">
                 {{ message }}
                 <form action="/proposal/add/" method="post" class="form-horizontal">
@@ -67,7 +67,7 @@
                             </select>
 
                         </div>
-                       <label  class="col-sm-1 control-label">Тема</label>
+                       <label  class="col-sm-1 control-label">1С:Тема</label>
                        <div class="col-sm-2">
                             <select class="form-control" name = "tema">
                                 {% for tema in tems %}
