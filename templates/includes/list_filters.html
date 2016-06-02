@@ -1,5 +1,5 @@
 {% verbatim %}
-<div class="panel panel-success">
+<div class="panel panel-success" ng-if="data.user.is_staff">
     <div class="panel-heading">Отделы</div>
     <div class="panel-body">
         <input class="form-control" type="text" placeholder="Поиск отдела..." ng-model="filters.search.otdel"/>
@@ -14,7 +14,7 @@
     </div>
 </div>
 
-<div class="panel panel-warning">
+<div class="panel panel-warning" ng-if="data.user.is_staff">
     <div class="panel-heading">Конфигурации 1С</div>
     <div class="panel-body">
         <input class="form-control" type="text" placeholder="Конфигурации..." ng-model="filters.search.configuration"/>

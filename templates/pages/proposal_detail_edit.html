@@ -1,30 +1,45 @@
 {% extends 'main.html' %}
+{% load static %}
 
 {% block title %}
     <title>Обработчик заявки на техническую поддержку</title>
 {% endblock %}
 
+{% block scripts %}
+    <script src="{% static 'js/library/angular.min.js' %}"></script>
+    <script src="{% static 'js/library/moment.js' %}"></script>
+    <script src="{% static 'js/app/support_edit.js' %}"></script>
+{% endblock %}
+
 {% block content %}
 <h2>Заявка</h2>
-<div class="container-fluid">
+<div class="container-fluid" ng-app="app">
     <div class="row">
         <div class="col-md-1"></div>
-        <div class="col-md-10">
-           <h2 class="text-center">Бланк заявки</h2>
+        <div class="col-md-10" ng-controller="SupportCtrl">
+           {% verbatim %}
+           <h2 class="text-center">Заяка#{{ data.support_req.id }}</h2>
+           {% endverbatim %}
             <div class="well">
-                {% if message %}
-                    <div class="alert alert-success" role="alert">{{ message }}</div>
-                {% endif %}
                 <form action="" method="post" class="form-horizontal">
                     {% csrf_token %}
+                    {% verbatim %}
                     <div class="form-group">
                         <label  class="col-sm-2 control-label">Пользователь</label>
                         <div class="col-sm-2">
-                            <input type="text" class="form-control"  placeholder="{{ user }}" disabled>
+                            <input type="text" class="form-control"  placeholder="{{ data.user.username }}" disabled>
                         </div>
                         <label  class="col-sm-1 control-label">Отдел</label>
                         <div class="col-sm-2">
-                           <input type="nuber" class="form-control"  placeholder="{{ user.otdel }}" disabled>
+                           <input type="nuber" class="form-control"  placeholder="{{ data.user.otdel.name }}" disabled>
+                        </div>
+                        <label  class="col-sm-1 control-label">Конфигурация 1С</label>
+                        <div class="col-sm-2">
+                              <select class="form-control"
+                                      ng-options = "config.id as config.name for config in data.user.otdel.configuration_1c"
+                                      ng-model="configurationC">
+                              </select>
+                            <input type="hidden" name = 'configuration' value="{{ configurationC }}"/>
                         </div>
                     </div>
 
@@ -33,31 +48,31 @@
                         <label  class="col-sm-2 control-label">Тип</label>
                         <div class="col-sm-2">
                             <select class="form-control" name = 'type'>
-                                {% for type in types %}
-                                    <option value="{{ type.id }}" {% if type.id == support_req.type.id %} selected {% endif %}>
-                                        {{ type }}
-                                    </option>
-                                {% endfor %}
+                                <option value="{{ type.id }}"
+                                    ng-selected = "{{ type.id == data.support_req.type.id }}"
+                                    ng-repeat="type in data.types">
+                                    {{ type.name }}
+                                </option>
                             </select>
                         </div>
                         <label  class="col-sm-1 control-label">Важность</label>
                         <div class="col-sm-2">
                             <select class="form-control" name = "important">
-                                {% for important in importants %}
-                                    <option value="{{ important.id }}" {% if important.id == support_req.vajnost.id %} selected {% endif %}>
-                                        {{ important }}
-                                    </option>
-                                {% endfor %}
+                                <option value="{{ important.id }}"
+                                    ng-selected = "{{ important.id == data.support_req.vajnost.id}}"
+                                    ng-repeat="important in data.importants">
+                                    {{ important.name }}
+                                </option>
                             </select>
                         </div>
                        <label  class="col-sm-1 control-label">Статус</label>
                        <div class="col-sm-2">
                             <select class="form-control" name = "status">
-                                {% for status in updates %}
-                                    <option value="{{ status.id }}" {% if status.id == support_req.status.id %} selected {% endif %}>
-                                        {{ status }}
-                                    </option>
-                                {% endfor %}
+                                <option value="{{ status.id }}"
+                                    ng-selected = "{{ status.id == data.support_req.status.id}}"
+                                    ng-repeat="status in data.updates">
+                                    {{ status.name }}
+                                </option>
                             </select>
                        </div>
                     </div>
@@ -69,43 +84,42 @@
                         <label  class="col-sm-2 control-label">Специалист</label>
                         <div class="col-sm-2">
                             <select class="form-control" name = "spec">
-                                {% for spec in specs %}
-                                    <option value="{{ spec.id }}" {% if spec == spec_active.user %} selected {% endif %}>
-                                        {{ spec}}
-                                    </option>
-                                {% endfor %}
+                                <option value="{{ spec.id }}"
+                                ng-selected = "{{ spec.id == data.spec_active.id}}"
+                                ng-repeat="spec in data.specs">
+                                    {{ spec.username }}
+                                </option>
                             </select>
-
                         </div>
-                       <label  class="col-sm-1 control-label">Тема</label>
+                       <label  class="col-sm-1 control-label">1С:Тема</label>
                        <div class="col-sm-2">
                             <select class="form-control" name = "tema">
-                                {% for tema in tems %}
-                                    <option value="{{ tema.id }}" {% if tema.id == support_req.tema.id %} selected {% endif %}>
-                                        {{ tema }}
-                                    </option>
-                                {% endfor %}
+                                <option value="{{ tema.id }}"
+                                    ng-selected = "{{ tema.id == data.support_req.tema.id }}"
+                                    ng-repeat="tema in data.tems | filter : {configuration_1c : configurationC}">
+                                    {{ tema.name }}
+                                </option>
                             </select>
                        </div>
 
 
                        <label for="date" class="col-sm-1 control-label">Сроки</label>
                        <div class="col-sm-2">
-                            <input type="date" class="form-control" name="date_dead" placeholder="Сроки" value="{{ support_req.srok|date:"Y-m-d" }}">
+                            <input type="date" class="form-control" name="date_dead" value="{{ data.support_req.srok }}">
                        </div>
                     </div>
                     <div class="form-group">
                         <label for="soder" class="col-sm-2 control-label">Краткое содержание</label>
                         <div class="col-sm-8">
-                            <textarea class="form-control" rows="3" id="soder" name = "desc" placeholder="Краткое содержание">{{ support_req.desc }}</textarea>
+                            <textarea class="form-control" rows="3" id="soder" name = "desc" placeholder="Краткое содержание" ng-model="data.support_req.desc"></textarea>
                         </div>
                     </div>
-                    <input type="submit" value="Сохранить изменения" class="btn btn-success"/>
+                    <input type="submit" value="Изменить заявку" class="btn btn-success"/>
+                    {% endverbatim %}
                 </form>
-
             </div>
-        </div>
         <div class="col-md-1"></div>
     </div>
+</div>
 </div>
 {% endblock %}

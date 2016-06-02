@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import Http404, HttpResponse, JsonResponse
 from .models import SupportRecuest, Vajnost, Status, Tema, Tip, Spec, User, Message, Otdel, ConfugurationOneC
-from .serializers import OtdelSerializer, UserSerializer, MessageSerializer, SupportRecuestSerializer, ConfugurationOneCSerializaer, VajnostSeriz, TemaSeriz
+from .serializers import OtdelSerializer, UserSerializer, MessageSerializer, SupportRecuestSerializer, ConfugurationOneCSerializaer, VajnostSeriz, TemaSeriz, TipSeriz, StatusSeriz
 from datetime import datetime, timedelta
 from django.http import HttpResponse, Http404, JsonResponse
 from support.helpers import cheсk_login, check_filtered_item
@@ -126,49 +126,54 @@ def detail_edit(request, id):
     user = cheсk_login(request)
     if user:
         support_req = get_object_or_404(SupportRecuest, id=id)
+        spec = get_object_or_404(Spec, support_rec=support_req)
         if support_req.creator == user:
-            spec = get_object_or_404(Spec, support_rec=support_req)
-            types = Tip.objects.all()
-            importants = Vajnost.objects.all()
-            updates = Status.objects.all()
-            specs = User.objects.filter(is_staff=True)
-            tems = Tema.objects.all()
+            if request.is_ajax():
+                types = Tip.objects.all()
+                importants = Vajnost.objects.all()
+                updates = Status.objects.all()
+                specs = User.objects.filter(is_staff=True)
+                tems = Tema.objects.filter(configuration_1c__in=user.otdel.configuration_1c.all())
 
-            data = {
-                'user': user,
-                'types': types,
-                'importants': importants,
-                'updates': updates,
-                'specs': specs,
-                'spec_active': spec,
-                'tems': tems,
-                'support_req': support_req
-            }
+                data = {
+                    'user': UserSerializer(user).data,
+                    'types': TipSeriz(types, many=True).data,
+                    'importants': VajnostSeriz(importants, many=True).data,
+                    'updates': StatusSeriz(updates, many=True).data,
+                    'specs': UserSerializer(specs, many=True).data,
+                    'tems': TemaSeriz(tems, many=True).data,
+                    'spec_active': UserSerializer(spec.user).data,
+                    'support_req': SupportRecuestSerializer(support_req).data
+                }
 
-            if request.method == 'GET':
-                data.update(csrf(request))
-                return render_to_response('pages/proposal_detail_edit.html',data)
-            elif request.method == 'POST':
-                if request.POST.get('date_dead', '') == '':
-                    date_dead = support_req.date + timedelta(days = 7)
-                else:
-                    date_dead = request.POST.get('date_dead', '')
+                return JsonResponse(data)
+            else:
+                if request.method == 'GET':
+                    data = {'user': user}
+                    data.update(csrf(request))
+                    return render_to_response('pages/proposal_detail_edit.html',data)
+                elif request.method == 'POST':
+                    if request.POST.get('date_dead', '') == '':
+                        date_dead = support_req.date + timedelta(days = 7)
+                    else:
+                        date_dead = request.POST.get('date_dead', '')
 
-                print(request.POST.get('date_dead', ''))
+                    print(request.POST)
 
-                support_req.desc = request.POST.get('desc', '')
-                support_req.type = Tip.objects.get(id=request.POST.get('type', ''))
-                support_req.status = Status.objects.get(id=request.POST.get('status', ''))
-                support_req.tema = Tema.objects.get(id=request.POST.get('tema', ''))
-                support_req.vajnost = Vajnost.objects.get(id=request.POST.get('important', ''))
-                support_req.srok = date_dead
-                support_req.save()
+                    support_req.desc = request.POST.get('desc', '')
+                    support_req.type = Tip.objects.get(id=request.POST.get('type', ''))
+                    support_req.status = Status.objects.get(id=request.POST.get('status', ''))
+                    support_req.tema = Tema.objects.get(id=request.POST.get('tema', ''))
+                    support_req.vajnost = Vajnost.objects.get(id=request.POST.get('important', ''))
+                    support_req.configuration_1c = ConfugurationOneC.objects.get(id=request.POST.get('configuration', ''))
+                    support_req.srok = date_dead
+                    support_req.save()
 
-                spec.user = User.objects.get(id=request.POST.get('spec', ''))
-                spec.save()
+                    spec.user = User.objects.get(id=request.POST.get('spec', ''))
+                    spec.save()
 
 
-                return redirect('/proposal/detail/%d/edit/' % support_req.id)
+                    return redirect('/proposal/detail/%d/edit/' % support_req.id)
 
         else:
             return redirect('/')

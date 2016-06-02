@@ -17,11 +17,11 @@
       <div class="col-md-1">
       </div>
 
-      <div class="col-md-3">
+      <div class="col-md-3" ng-if="data.user.is_staff">
         {% include 'includes/list_filters.html' %}
       </div>
 
-      <div class="col-md-7">
+      <div ng-class="{'col-md-7' : data.user.is_staff, 'col-md-10': !data.user.is_staff}">
           <div class="panel panel-primary">
              <div class="panel-heading">Список заявок</div>
 

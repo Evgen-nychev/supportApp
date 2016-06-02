@@ -15,13 +15,8 @@
 <div class="container-fluid" ng-app="app">
     <div class="row">
         <div class="col-md-1"></div>
-<<<<<<< HEAD
         <div class="col-md-10" ng-controller="SupportCtrl">
-           <h2 class="text-center">Бланк заявки</h2>
-=======
-        <div class="col-md-10">
            <h2 class="text-center">Бланк заявки на техническую поддержку 1С</h2>
->>>>>>> 25d623be40df76c52b120b75d17de1e832dc4026
             <div class="well">
                 <form action="/proposal/add/" method="post" class="form-horizontal">
                     {% csrf_token %}
@@ -110,11 +105,9 @@
                     <input type="submit" value="Создать Заявку" class="btn btn-primary"/>
                     {% endverbatim %}
                 </form>
-
-
             </div>
-        </div>
         <div class="col-md-1"></div>
     </div>
+</div>
 </div>
 {% endblock %}
