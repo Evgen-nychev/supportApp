@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response, redirect, get_object_or_404
 from django.http import Http404, HttpResponse, JsonResponse
 from .models import SupportRecuest, Vajnost, Status, Tema, Tip, Spec, User, Message, Otdel, ConfugurationOneC
-from .serializers import OtdelSerializer, UserSerializer, MessageSerializer, SupportRecuestSerializer, ConfugurationOneCSerializaer
+from .serializers import OtdelSerializer, UserSerializer, MessageSerializer, SupportRecuestSerializer, ConfugurationOneCSerializaer, VajnostSeriz, TemaSeriz
 from datetime import datetime, timedelta
 from django.http import HttpResponse, Http404, JsonResponse
 from support.helpers import cheсk_login, check_filtered_item
@@ -66,6 +66,8 @@ def list(request, status="all"):
                 data = {'support_reqs': support_reqs}
 
             data['user'] = UserSerializer(user).data
+            data['importants'] = VajnostSeriz(Vajnost.objects.all(), many=True).data
+            data['tems'] = TemaSeriz(Tema.objects.all(), many=True).data
             data['otdels'] = OtdelSerializer(Otdel.objects.all(), many=True).data
             data['configurations'] = ConfugurationOneCSerializaer(ConfugurationOneC.objects.all(), many=True).data
             return JsonResponse(data)

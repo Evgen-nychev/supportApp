@@ -42,13 +42,47 @@
                     ng-click="setStatus('close')">
                       Закрытые
                   </button>
-              </div>
+                </div>
+                  {% verbatim %}
+                  <div class="btn-group pull-right">
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-info">Тема</button>
+                        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                        <span class="sr-only">Меню с переключением</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat = "tema in data.tems | filter : filteredTemaByOtdel(filters.otdel_obj)
+                                | filter : filteredTemaByConfigur(filters.configuration)"
+                                ng-class="{'active': filters.tema == tema.id}"
+                                ng-click="setTema(tema.id)">
+                                <a href="#">{{ tema.name }}</a>
+                            </li>
+                        </ul>
+                      </div>
 
+                      <div class="btn-group">
+                        <button type="button" class="btn btn-danger">Важность</button>
+                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                        <span class="caret"></span>
+                        <span class="sr-only">Меню с переключением</span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            <li ng-repeat = "important in data.importants"
+                                ng-class="{'active': filters.important == important.id}"
+                                ng-click="setImportant(important.id)">
+                                <a href="#">{{ important.name }}</a>
+                            </li>
+                        </ul>
+                      </div>
+                  </div>
+                  {% endverbatim %}
               </div>
               <ul class="list-group">
                   {% verbatim %}
                   <li class="list-group-item" ng-repeat="support_req in data.support_reqs | filter : filteredStatus(filters.status)
-                  | filter : {creator : {otdel : {id : filters.otdel}}, configuration_1c : {id : filters.configuration} } as filteredSupport">
+                  | filter : {creator : {otdel : {id : filters.otdel}}, configuration_1c : {id : filters.configuration},
+                    vajnost : {id: filters.important}, tema : {id : filters.tema} } as filteredSupport">
                     <div class="media">
                         <div class="media-body">
                         <h4 class="media-heading">

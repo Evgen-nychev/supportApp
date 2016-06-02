@@ -8,22 +8,22 @@
         <a href="" class="list-group-item"
            ng-repeat ="otdel in data.otdels | filter : { name: filters.search.otdel}"
            ng-class = "{'list-group-item-success': otdel.id == filters.otdel}"
-           ng-click ="setOtdel(otdel.id)">
+           ng-click ="setOtdel(otdel)">
             {{ otdel.name }}
         </a>
     </div>
 </div>
 
-<div class="panel panel-danger">
+<div class="panel panel-warning">
     <div class="panel-heading">Конфигурации 1С</div>
     <div class="panel-body">
         <input class="form-control" type="text" placeholder="Конфигурации..." ng-model="filters.search.configuration"/>
     </div>
     <div class="list-group">
         <a href="" class="list-group-item"
-           ng-repeat ="configuration in data.configurations | filter : filteredConfigur(filters.otdel)
+           ng-repeat ="configuration in data.configurations | filter : filteredConfigur(filters.otdel_obj)
            | filter : {name : filters.search.configuration}"
-           ng-class ="{' list-group-item-danger': configuration.id == filters.configuration}"
+           ng-class ="{' list-group-item-warning': configuration.id == filters.configuration}"
            ng-click = "setConfig(configuration.id)">
             {{ configuration.name }}
         </a>

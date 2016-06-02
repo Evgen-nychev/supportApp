@@ -11,8 +11,11 @@ App.controller('SupportListCtrl', function($scope, $http){
     var init = function(){
         $scope.filters = {
             otdel: '',
+            otdel_obj: '',
             configuration: '',
             status: 'all',
+            important: '',
+            tema: '',
             search : {
                 otdel : '',
                 configuration : ''
@@ -25,6 +28,9 @@ App.controller('SupportListCtrl', function($scope, $http){
                 $scope.data = response.data
                 $scope.data.otdels.unshift({id:'', name:'Все'});
                 $scope.data.configurations.unshift({id:'', name:'Все'});
+                $scope.data.importants.unshift({id:'', name:'Все'});
+                $scope.data.tems.unshift({id:'', name:'Все'});
+                $scope.filters.otdel_obj = $scope.data.otdels[0];
             })
     }
 
@@ -33,12 +39,23 @@ App.controller('SupportListCtrl', function($scope, $http){
     }
 
     $scope.setOtdel = function(otdel){
-        $scope.filters.otdel = otdel;
+        $scope.filters.otdel = otdel.id;
+        $scope.filters.otdel_obj = otdel;
         $scope.filters.configuration = "";
+        $scope.filters.tema = "";
     }
 
     $scope.setConfig = function(config){
         $scope.filters.configuration = config;
+        $scope.filters.tema = "";
+    }
+
+    $scope.setImportant = function(important){
+        $scope.filters.important = important;
+    }
+
+    $scope.setTema = function(tema){
+        $scope.filters.tema = tema;
     }
 
     var findById = function(id, items){
@@ -81,19 +98,16 @@ App.controller('SupportListCtrl', function($scope, $http){
             }
         }
     }
-
+    //Фильрация 1С конфигураций (при выборе отдела)
     $scope.filteredConfigur = function(otdel){
         return function(item){
-            otdel = findById(otdel , $scope.data.otdels);
-            console.log(otdel, item)
             if(otdel.id){
                 if(item.id){
                     search_item = findById(item.id, otdel.configuration_1c)
-                    //console.log(search_item)
                     if(search_item){
-                        return true
+                        return true;
                     }else{
-                        false
+                        false;
                     }
                 }else{
                     return true;
@@ -103,6 +117,42 @@ App.controller('SupportListCtrl', function($scope, $http){
             }
         }
     }
+    //Фильрация тем при изменении отдела
+    $scope.filteredTemaByOtdel = function(otdel){
+        return function(item){
+            if(otdel.id){
+                if(item.id){
+                    search_item = findById(item.configuration_1c, otdel.configuration_1c)
+                    if(search_item){
+                        return true;
+                    }else{
+                        false;
+                    }
+                }else{
+                    return true
+                }
+            }else{
+                return true
+            }
+        }
+    }
 
+    $scope.filteredTemaByConfigur = function(configur){
+        return function(item){
+            if(configur){
+                if(item.id){
+                    if(item.configuration_1c == configur){
+                        return true
+                    }else{
+                        return false
+                    }
+                }else{
+                    return true
+                }
+            }else{
+                return true
+            }
+        }
+    }
     init()
 })
