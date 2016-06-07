@@ -202,7 +202,7 @@ def reports(request):
 
         result = []
         supp_reqs = SupportRecuest.objects.filter(**filtered_items)
-        specs = Spec.objects.filter(support_rec__in=supp_reqs)
+        specs = Spec.objects.filter(user=request.user, support_rec__in=supp_reqs)
 
         for spec in specs:
             result.append({
@@ -211,6 +211,7 @@ def reports(request):
                 'Тип': spec.support_rec.type.name,
                 'Важность': spec.support_rec.vajnost.name,
                 "Отдел": spec.support_rec.creator.otdel.name,
+                'Версия 1С': spec.support_rec.configuration_1c.name,
                 'Статус': spec.support_rec.status.name,
                 'Дата Создания': spec.support_rec.date,
                 "Срок(До)": spec.support_rec.srok,
